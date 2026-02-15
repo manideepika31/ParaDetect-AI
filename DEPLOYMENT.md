@@ -1,46 +1,114 @@
 # Deployment Guide
 
-## Production Deployment
+## Important: This is a Full-Stack Application
 
-### Backend Deployment
+This project requires **both** a backend server (Python/FastAPI) and a frontend (React). You cannot deploy it as a simple static website on GitHub Pages alone.
 
-#### Option 1: Docker (Recommended)
+## Deployment Options
 
-Create `backend/Dockerfile`:
-```dockerfile
-FROM python:3.10-slim
+### Option 1: Separate Deployments (Recommended)
 
-WORKDIR /app
+#### Frontend → Vercel/Netlify (Free)
+#### Backend → Render/Railway/Heroku (Free tier available)
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+---
 
-COPY . .
+## Frontend Deployment
 
-EXPOSE 8000
+### Deploy to Vercel (Recommended - Free)
 
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
-```
+1. **Push your code to GitHub**
+
+2. **Go to [vercel.com](https://vercel.com)**
+   - Sign in with GitHub
+   - Click "New Project"
+   - Import your repository
+
+3. **Configure build settings:**
+   - Framework Preset: `Vite`
+   - Root Directory: `frontend`
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+
+4. **Add environment variable:**
+   - Name: `VITE_API_URL`
+   - Value: Your backend URL (e.g., `https://your-backend.onrender.com`)
+
+5. **Deploy!**
+
+### Deploy to Netlify (Alternative - Free)
+
+1. **Push your code to GitHub**
+
+2. **Go to [netlify.com](https://netlify.com)**
+   - Sign in with GitHub
+   - Click "New site from Git"
+   - Choose your repository
+
+3. **Configure build settings:**
+   - Base directory: `frontend`
+   - Build command: `npm run build`
+   - Publish directory: `frontend/dist`
+
+4. **Add environment variable:**
+   - Key: `VITE_API_URL`
+   - Value: Your backend URL
+
+5. **Deploy!**
+
+---
+
+## Backend Deployment
+
+### Deploy to Render (Recommended - Free)
+
+1. **Go to [render.com](https://render.com)**
+   - Sign in with GitHub
+   - Click "New +" → "Web Service"
+   - Connect your repository
+
+2. **Configure service:**
+   - Name: `paradetect-backend`
+   - Root Directory: `backend`
+   - Runtime: `Python 3`
+   - Build Command: `pip install -r requirements-pytorch.txt`
+   - Start Command: `uvicorn app_pytorch:app --host 0.0.0.0 --port $PORT`
+
+3. **Add environment variables:**
+   - `PYTHON_VERSION`: `3.11.0`
+   - `PORT`: `8000` (Render sets this automatically)
+
+4. **Deploy!**
+
+5. **Copy your backend URL** (e.g., `https://paradetect-backend.onrender.com`)
+
+### Deploy to Railway (Alternative - Free)
+
+1. **Go to [railway.app](https://railway.app)**
+   - Sign in with GitHub
+   - Click "New Project" → "Deploy from GitHub repo"
+
+2. **Configure:**
+   - Root Directory: `backend`
+   - Build Command: `pip install -r requirements-pytorch.txt`
+   - Start Command: `uvicorn app_pytorch:app --host 0.0.0.0 --port $PORT`
+
+3. **Deploy!**
+
+---
+
+## Docker Deployment (Self-Hosted)
+
+### Backend Docker
 
 Build and run:
 ```bash
+cd backend
 docker build -t paradetect-backend .
 docker run -p 8000:8000 paradetect-backend
 ```
 
-#### Option 2: Gunicorn + Uvicorn
-
-Install:
-```bash
-pip install gunicorn
-```
-
-Run:
-```bash
-gunicorn app:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
-```
-
-### Frontend Deployment
+### Frontend Build
 
 Build for production:
 ```bash
@@ -48,11 +116,7 @@ cd frontend
 npm run build
 ```
 
-Deploy `dist/` folder to:
-- Vercel
-- Netlify
-- AWS S3 + CloudFront
-- Nginx
+Deploy `dist/` folder to any static hosting
 
 ### Environment Variables
 
