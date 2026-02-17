@@ -349,6 +349,7 @@ npm run dev
 
 ---
 
-**Built with ❤️ using AI and modern web technologies**
+**created by bitbuilder team**
 #
+
 
